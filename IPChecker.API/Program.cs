@@ -1,4 +1,5 @@
 
+using IPChecker.API.MIddleWares;
 using IPChecker.Repository.Interfaces;
 using IPChecker.Repository.Repositories;
 using IPChecker.Service.Interfaces;
@@ -36,6 +37,7 @@ namespace IPChecker.API
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<ExcptionMiddlewares>();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
