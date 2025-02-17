@@ -60,10 +60,11 @@ namespace IPChecker.Service.Services
             };
         }
 
-        public List<BlockedCountryDto> GetBlockedCountries()
+        public List<BlockedCountryDto> GetBlockedCountries(int page, int pageSize, string? search, string? filter, out int totalCount)
         {
-            var entities = _blockedCountryRepository.GetBlockedCountries();
-            return _mapper.Map<List<BlockedCountryDto>>(entities);
+            var blockedCountries = _blockedCountryRepository.GetBlockedCountries(page, pageSize, search, filter);
+            totalCount = _blockedCountryRepository.GetBlockedCountriesCount(search, filter);
+            return _mapper.Map<List<BlockedCountryDto>>(blockedCountries);
         }
 
         public List<BlockedAttemptDto> GetBlockedAttempts()

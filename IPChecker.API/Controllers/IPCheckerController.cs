@@ -37,11 +37,19 @@ public class BlockController : ControllerBase
     }
 
     [HttpGet("Blocked-Countries")]
-    public IActionResult GetBlockedCountries()
+    public IActionResult GetBlockedCountries([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? search = null, [FromQuery] string? filter = null)
     {
-        var result = _blockService.GetBlockedCountries();
-        return Ok(result);
+        var blockedCountries = _blockService.GetBlockedCountries(page, pageSize, search, filter, out int totalCount);
+
+        return Ok(new
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            Data = blockedCountries
+        });
     }
+
 
     [HttpGet("Blocked-attempts")]
     public IActionResult GetBlockedAttempts()
@@ -50,7 +58,7 @@ public class BlockController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("Temporary-block")]
+    [HttpPost("TemporarilyBlockCountry")]
     public IActionResult TemporarilyBlockCountry(string countryCode, int duration)
     {
         _blockService.TemporarilyBlockCountry(countryCode, duration);

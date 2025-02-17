@@ -11,29 +11,28 @@ namespace IPChecker.Repository.Repositories
 {
     public class BlockedAttemptsRepository : IBlockedAttemptsRepository
     {
-        private readonly List<BlockedAttempt> _blockedAttempts = new();
+        private readonly ConcurrentDictionary<string, BlockedAttempt> _blockedAttempts = new();
+
         public void AddBlockedAttempt(string ip, string countryCode)
         {
-            var existingAttempt = _blockedAttempts.FirstOrDefault(a => a.IP == ip);
-            if (existingAttempt != null)
-            {
-                existingAttempt.CountryCode = countryCode;
-                existingAttempt.AttemptTime = DateTime.UtcNow;
-            }
-            else
-            {
-                _blockedAttempts.Add(new BlockedAttempt
+            _blockedAttempts.AddOrUpdate(ip,
+                new BlockedAttempt
                 {
                     IP = ip,
                     CountryCode = countryCode,
                     AttemptTime = DateTime.UtcNow
+                },
+                (key, existingAttempt) =>
+                {
+                    existingAttempt.CountryCode = countryCode;
+                    existingAttempt.AttemptTime = DateTime.UtcNow;
+                    return existingAttempt;
                 });
-            }
         }
 
         public List<BlockedAttempt> GetBlockedAttempts()
         {
-            return _blockedAttempts.ToList();
+            return _blockedAttempts.Values.ToList();
         }
     }
 }
